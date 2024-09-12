@@ -18,11 +18,10 @@ module.exports = function (app) {
       !/[a-i]/i.test(row) ||
       !/[1-9]/i.test(column)
     ) {
-      console.log("invalid coordinate :>> ");
       res.json({ error: "Invalid coordinate" });
       return;
     }
-    if (!/[1-9]/i.test(value)) {
+    if (!/^[1-9]$/.test(value)) { // исправлено условие регулярного выражения
       res.json({ error: "Invalid value" });
       return;
     }
@@ -34,6 +33,14 @@ module.exports = function (app) {
       res.json({ error: "Invalid characters in puzzle" });
       return;
     }
+  
+    // Новая проверка
+    const existingValue = puzzle[(row.charCodeAt(0) - 'A'.charCodeAt(0)) * 9 + (parseInt(column) - 1)];
+    if (existingValue === value) {
+      res.json({ valid: true });
+      return;
+    }
+  
     let validCol = solver.checkColPlacement(puzzle, row, column, value);
     let validReg = solver.checkRegionPlacement(puzzle, row, column, value);
     let validRow = solver.checkRowPlacement(puzzle, row, column, value);
